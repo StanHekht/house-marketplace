@@ -7,7 +7,6 @@ import {
   where,
   orderBy,
   limit,
-  startAfter,
 } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
@@ -18,6 +17,7 @@ function Offers() {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // eslint-disable-next-line no-unused-vars
   const params = useParams();
 
   useEffect(() => {
