@@ -8,6 +8,7 @@ import {
   orderBy,
   limit,
   startAfter,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
@@ -18,6 +19,7 @@ function Category() {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
+  const [count, setCount] = useState(null);
 
   const params = useParams();
 
@@ -26,6 +28,14 @@ function Category() {
       try {
         // Get a reference
         const listingsRef = collection(db, 'listings');
+
+        // Get total listings count from the server
+        const countQuery = query(
+          listingsRef,
+          where('type', '==', params.categoryName)
+        );
+        const countDocs = await getCountFromServer(countQuery);
+        setCount(countDocs.data().count);
 
         //Create a query
         const q = query(
@@ -127,7 +137,7 @@ function Category() {
 
           <br />
           <br />
-          {lastFetchedListing && (
+          {lastFetchedListing && listings?.length < count && (
             <p className='loadMore' onClick={onFetchMoreListings}>
               Load More
             </p>

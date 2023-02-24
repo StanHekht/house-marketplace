@@ -8,6 +8,7 @@ import {
   orderBy,
   limit,
   startAfter,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
@@ -18,6 +19,7 @@ function Offers() {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
+  const [count, setCount] = useState(null);
 
   // eslint-disable-next-line no-unused-vars
   const params = useParams();
@@ -27,6 +29,11 @@ function Offers() {
       try {
         // Get a reference
         const listingsRef = collection(db, 'listings');
+
+        // Get total listings count from the server
+        const countQuery = query(listingsRef, where('offer', '==', true));
+        const countDocs = await getCountFromServer(countQuery);
+        setCount(countDocs.data().count);
 
         //Create a query
         const q = query(
@@ -124,7 +131,7 @@ function Offers() {
 
           <br />
           <br />
-          {lastFetchedListing && (
+          {lastFetchedListing && listings?.length < count && (
             <p className='loadMore' onClick={onFetchMoreListings}>
               Load More
             </p>
